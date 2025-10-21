@@ -11,7 +11,6 @@ if (!isset($_GET['link'])) {
 
 $target_url = $_GET['link'];
 
-// شبیه‌سازی getallheaders() برای هاست‌هایی که پشتیبانی نمی‌کنند
 function get_request_headers() {
     $headers = [];
     foreach ($_SERVER as $name => $value) {
@@ -23,14 +22,16 @@ function get_request_headers() {
     return $headers;
 }
 
-// cURL
 $ch = curl_init();
 curl_setopt($ch, CURLOPT_URL, $target_url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);  // دنبال کردن ریدایرکت
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // در صورت مشکل SSL
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-curl_setopt($ch, CURLOPT_TIMEOUT, 20);          // زمان محدود برای پاسخ
+curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+
+// 👇 اضافه کن برای رفع مشکل gzip
+curl_setopt($ch, CURLOPT_ENCODING, "");
 
 // هدرها
 $headers = [];
@@ -53,7 +54,6 @@ if (curl_errno($ch)) {
 $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
 
-// ارسال پاسخ
 http_response_code($http_code);
 header('Content-Type: application/json');
 echo $response;
